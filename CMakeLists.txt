@@ -59,6 +59,59 @@ include(SourceList)
 include(IncludeList)
 
 # Executable files (binaries) 
+add_executable(${EXECUTABLE} ${source_list})
+
+# Inc paths 
+target_include_directories(${EXECUTABLE} PRIVATE ${include_list})
+
+# Project symbols 
+target_compile_definitions(${EXECUTABLE} PRIVATE ${compiler_define}) 
+
+# Compiler options 
+target_compile_options(${EXECUTABLE} PRIVATE
+	${CPU_PARAMETERS}
+	-Wall
+	-Wpedantic
+	-Wno-unused-parameter
+)
+
+
+# Linker options 
+target_link_options(${EXECUTABLE} PRIVATE 
+	-T${LINKER_SCRIPT_SRC}
+	${CPU_PARAMETERS}
+	-Wl, -Map=${CMAKE_PROJECT_NAME}.map 
+	--specs=nosys.specs
+	# -u _print_float - STDIO float formatting support 
+	-Wl,--start-group 
+	-lc
+	-lm
+	-lstdc++
+	-lsupc++
+	-Wl,--end-group
+	-Wl,--print-memory-usage
+)
+
+# Executes post build to print the build size 
+add_custom_command(TARGET ${EXECUTABLE} POST_BUILD 
+	COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${EXECUTABLE}>
+)
+
+# Convert the output to hex and binary 
+add_custom_command(TARGET ${EXECUTABLE} POST_BUILD 
+	COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${EXECUTABLE}> ${EXECUTABLE}.hex 
+) 
+
+# Convert to bin files - should add conditional checks(e.g. if build filed, but 
+# some object files were already created - they are most probably corrupt so should remove) 
+add_custom_command(TARGET ${EXECUTABLE} POST_BUILD 
+	COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${EXECUTABLE}> ${EXECUTABLE}.bin
+)
+
+
+
+
+
 
 
 
