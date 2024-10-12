@@ -22,7 +22,7 @@ set(CMAKE_C_EXTENSIONS          	ON)
 # C++: 
 set(CMAKE_CXX_STANDARD          	17)
 set(CMAKE_CXX_STANDARD_REQUIRED		ON)
-set(CMAKE_CXX_EXTENSIONS		ON)
+set(CMAKE_CXX_EXTENSIONS			ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS	ON)
 
@@ -36,13 +36,13 @@ set(CMAKE_TOOLCHAIN_FILE		gcc-arm-none-eabi)
 
 
 # Project Name - EDIT ACCORDING TO YOUR PROJECT 
-project(401RE-Template) 
+project(PULSE_GEN) 
 
 enable_language(C CXX ASM)
 
 
 # Linker file - EDIT ACCORDING TO YOUR PROJECT 
-set(linker_script_SRC			${CMAKE_PROJECT_NAME}/Core/STM32F401RETX_FLASH.ld)
+set(linker_script_SRC			${PROJ_PATH}/STM32F401RETX_FLASH.ld)
 
 # Use project name when compiling into binary files (binary names) 
 set(EXECUTABLE				${CMAKE_PROJECT_NAME}) 
@@ -50,12 +50,11 @@ set(EXECUTABLE				${CMAKE_PROJECT_NAME})
 
 # MCU Specific settings - EDIT ACCORDING TO YOUR PROJECT
 # Path defined in list() function above
-include(STM32F4xx_HAL_PARA)
 
-set(CPU_PARAMETERS
+set(CPU_PARAMETERS ${CPU_PARAMETERS}	
 	-mthumb
 
-	-mpu=cortex-m4		# Modifed
+	-mcpu=cortex-m4		# Modifed
 	-mfpu=fpv4-sp-d16	# Modifed
 	-mfloat-abi=hard	# Modified
 
@@ -86,18 +85,20 @@ target_compile_definitions(${EXECUTABLE} PRIVATE ${compiler_define})
 
 # Compiler options 
 target_compile_options(${EXECUTABLE} PRIVATE
-	${CPU_PARAMETERS}
+	-T${CPU_PARAMETERS}
 	-Wall
 	-Wpedantic
 	-Wno-unused-parameter
+	# Debug configuration
+	-Og -g3 -ggdb
 )
 
 
 # Linker options 
 target_link_options(${EXECUTABLE} PRIVATE 
-	-T${LINKER_SCRIPT_SRC}
+	-T${linker_script_SRC}
 	${CPU_PARAMETERS}
-	-Wl, -Map=${CMAKE_PROJECT_NAME}.map 
+	-Wl,-Map=${CMAKE_PROJECT_NAME}.map 
 	--specs=nosys.specs
 	# -u _print_float - STDIO float formatting support 
 	-Wl,--start-group 
