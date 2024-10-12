@@ -40,6 +40,7 @@ project(401RE-Template)
 
 enable_language(C CXX ASM)
 
+
 # Linker file - EDIT ACCORDING TO YOUR PROJECT 
 set(linker_script_SRC			${CMAKE_PROJECT_NAME}/Core/STM32F401RETX_FLASH.ld)
 
@@ -50,6 +51,22 @@ set(EXECUTABLE				${CMAKE_PROJECT_NAME})
 # MCU Specific settings - EDIT ACCORDING TO YOUR PROJECT
 # Path defined in list() function above
 include(STM32F4xx_HAL_PARA)
+
+set(CPU_PARAMETERS
+	-mthumb
+
+	-mpu=cortex-m4		# Modifed
+	-mfpu=fpv4-sp-d16	# Modifed
+	-mfloat-abi=hard	# Modified
+
+	-fdata-sections
+	-ffunction-sections 
+)
+
+set(compiler_define ${compiler_define}
+	"USE_HAL_DRIVER"
+	"STM32F4xx"
+)
 
 
 # .cmake module generated using .\getIncludeList.sh and .\getSourceList.sh 
